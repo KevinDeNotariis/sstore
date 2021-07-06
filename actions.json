@@ -1,0 +1,8 @@
+[
+  { "name": "Add a new Secret", "value": "addNewSecret" },
+  { "name": "List Secrets", "value": "listSecrets" },
+  { "name": "Update Secret", "value": "updateSecret" },
+  { "name": "Delete Secret", "value": "deleteSecret" },
+  { "name": "Change Master Password", "value": "changeMasterPassword" },
+  { "name": "Exit", "value": "exit" }
+]

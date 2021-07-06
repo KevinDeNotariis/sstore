@@ -1,0 +1,43 @@
+{
+  "name": "passwordstore",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pkg": "pkg . --output sstore.exe",
+    "ncc": "ncc build -m index.mjs -o dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "pkg": "^5.3.0"
+  },
+  "pkg": {
+    "assets": [
+      "dist/fonts/Standard.flf",
+      "dist/code-points.mem"
+    ],
+    "targets": [
+      "node14-win-x64"
+    ],
+    "options": [
+      "experimental-modules"
+    ]
+  },
+  "bin": "dist/index.js",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "chalk": "^4.1.1",
+    "clear": "^0.1.0",
+    "clui": "^0.3.6",
+    "configstore": "^6.0.0",
+    "crypto-js": "^4.0.0",
+    "figlet": "^1.5.0",
+    "inquirer": "^8.1.1",
+    "minimist": "^1.2.5",
+    "mongoose": "^5.13.2"
+  },
+  "type": "module"
+}
