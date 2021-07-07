@@ -1,5 +1,6 @@
 import CryptoJS from "crypto-js";
-import Secret from "../models/SecretModel.mjs";
+import Configstore from "configstore";
+const conf = new Configstore("sstore");
 
 export const saveSecret = async ({ name, secret, masterPassword }) => {
   const passwordCipher = CryptoJS.AES.encrypt(
@@ -7,25 +8,15 @@ export const saveSecret = async ({ name, secret, masterPassword }) => {
     masterPassword
   ).toString();
 
-  const secretDoc = new Secret({
-    name: name,
-    secretCipher: passwordCipher,
-  });
-
-  try {
-    await secretDoc.save();
-  } catch (e) {
-    throw new Error(e);
+  if (!conf.get(name.replace(".", "\\."))) {
+    conf.set(name.replace(".", "\\."), passwordCipher);
   }
+
   return true;
 };
 
 export const deleteSecret = async ({ name }) => {
-  try {
-    await Secret.deleteOne({ name });
-  } catch (e) {
-    throw new Error(e);
-  }
+  conf.delete(name.replace(".", "\\."));
 };
 
 export const updateSecret = async ({ name, newSecret, masterPassword }) => {
@@ -34,17 +25,7 @@ export const updateSecret = async ({ name, newSecret, masterPassword }) => {
     masterPassword
   ).toString();
 
-  try {
-    await Secret.updateOne(
-      {
-        name: name,
-      },
-      {
-        secretCipher: newSecretCipher,
-      }
-    );
-    return true;
-  } catch (e) {
-    throw new Error(e);
-  }
+  conf.set(name.replace(".", "\\."), newSecretCipher);
+
+  return true;
 };

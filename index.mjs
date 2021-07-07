@@ -1,11 +1,10 @@
-import mongoose from "mongoose";
 import chalk from "chalk";
 import clear from "clear";
 import figlet from "figlet";
 import CryptoJS from "crypto-js";
 
-import Secret from "./models/SecretModel.mjs";
 import * as secretController from "./controllers/secretController.mjs";
+import decryptSecret from "./helpers/decryptSecret.mjs";
 
 import {
   setUpMasterPassword,
@@ -30,12 +29,6 @@ const conf = new Configstore("sstore");
 let MASTER_PASSWORD;
 
 (async () => {
-  // Connect to the MongoDB local service
-  await mongoose.connect("mongodb://localhost:27017/secrets", {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  });
-
   // Clear the screen
   clear();
 
@@ -137,23 +130,27 @@ let MASTER_PASSWORD;
       const oldMasterPassword = MASTER_PASSWORD;
       const newMasterPassword = (await setUpMasterPassword()).masterPassword;
       MASTER_PASSWORD = newMasterPassword;
-      try {
-        Secret.find({}).then(async (secrets) => {
-          secrets.map(async (elem) => {
-            elem.secretCipher = CryptoJS.AES.encrypt(
-              CryptoJS.AES.decrypt(elem.secretCipher, oldMasterPassword),
-              newMasterPassword
-            );
-            await elem.save();
-          });
-          console.log(
-            chalk.greenBright("Master password has been correctly changed")
+
+      let secrets = Object.keys(conf.all);
+      secrets = secrets.filter((elem) => elem !== "masterPassword");
+
+      if (secrets.length >= 1) {
+        for (let secret of secrets) {
+          const oldSecret = CryptoJS.AES.decrypt(
+            conf.get(secret.replace(".", "\\.")).toString(),
+            oldMasterPassword
           );
-          done();
-        });
-      } catch (e) {
-        throw new Error(e);
+          const newSecret = CryptoJS.AES.encrypt(
+            oldSecret,
+            newMasterPassword
+          ).toString();
+          conf.set(secret.replace(".", "\\."), newSecret);
+        }
       }
+      console.log(
+        chalk.greenBright("Master password has been correctly changed")
+      );
+      done();
     });
   };
 
@@ -202,7 +199,7 @@ let MASTER_PASSWORD;
     const deleteConf = (await askForDeleteConfirmation()).delete;
     if (deleteConf) {
       try {
-        await Secret.deleteOne({ name: secretName });
+        conf.delete(secretName.replace(".", "\\."));
         console.log(
           chalk.redBright("The secret"),
           chalk.blueBright(secretName),
@@ -223,9 +220,9 @@ let MASTER_PASSWORD;
   };
 
   const parseSecret = async (secret) => {
-    const secr = await Secret.findOne({ name: secret.secretName });
+    const secr = conf.get(secret.secretName.replace(".", "\\."));
     if (secr) {
-      const secretDecrypted = secr.decryptSecret(MASTER_PASSWORD);
+      const secretDecrypted = decryptSecret(secr, MASTER_PASSWORD);
       console.log(chalk.bgYellow(chalk.black(secretDecrypted)));
     }
   };
