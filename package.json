@@ -20,7 +20,8 @@
       "dist/code-points.mem"
     ],
     "targets": [
-      "node14-win-x64"
+      "node14-win-x64",
+      "node14-linux-x64"
     ],
     "options": [
       "experimental-modules"
@@ -28,6 +29,7 @@
   },
   "bin": "dist/index.js",
   "dependencies": {
+    "@vercel/ncc": "^0.28.6",
     "bcryptjs": "^2.4.3",
     "chalk": "^4.1.1",
     "clear": "^0.1.0",
@@ -36,8 +38,7 @@
     "crypto-js": "^4.0.0",
     "figlet": "^1.5.0",
     "inquirer": "^8.1.1",
-    "minimist": "^1.2.5",
-    "mongoose": "^5.13.2"
+    "minimist": "^1.2.5"
   },
   "type": "module"
 }

@@ -13,11 +13,7 @@ Simple secrets manager which uses a master password to encrypt and decrypt secre
 
 # Requirements
 
-- MongoDB installed as a service (on port `27017`)
-
 - Nodejs v14 (to play with the source code)
-
-- Win-x64 to run the executable `sstore.exe`.
 
 # Build The Executable
 
@@ -35,15 +31,25 @@ After that, we can use:
 npm run pkg
 ```
 
-which will create a win-x64 executable named `sstore.exe`.
+which will create two executables:
+
+- `sstore.exe-linux`
+
+- `sstore.exe-win.exe`
+
+which can be run respectively on a x64 linux machine and a x64 windows machine.
 
 # How does it work?
 
-This tool is built upon MongoDB installed locally as a service on port `27017`. Best would be to use the MongoDB Atlas so that there will also be a backup on the cloud for every inconvenience. In order to do that, one just has to change the `mongoose.connect` string to that furnished by the MongoDB Atlas.
+This tool is built upon the npm package `configstore`.
 
-The master password will be saved **Hashed** using the npm module `configstore`, which will create a JSON file in `$HOME/.configstore`.
+The master password will be saved **Hashed** in the JSON created by `configstore` in `$HOME/.configstore`.
 
-The secrets are stored in a collection named `secrets` in a database named `secrets`.
+The secrets will be stored as key-value pair in the same JSON as the master password as:
+
+```json
+"secretName": "secretValue"
+```
 
 Each secret is composed of a `name` and a `secret` where the name might be for example a site name and the secret might be the password to log in.
 
